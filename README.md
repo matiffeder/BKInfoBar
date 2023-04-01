@@ -1,5 +1,8 @@
 # BKInfoBar
 
+![](https://media.forgecdn.net/attachments/145/441/BKInfoBar.png)  
+![](https://media.forgecdn.net/attachments/145/432/GUI.png)  
+  
 **The easiest and smallest information bar.**
 
 ## Features
