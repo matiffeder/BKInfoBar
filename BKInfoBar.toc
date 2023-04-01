@@ -1,0 +1,9 @@
+##
+## BK Info Bar 2.0.2beta
+## by Bkxx
+## released under the Creative Commons License By-Nc-Sa:
+## http://creativecommons.org/licenses/by-nc-sa/3.0/
+##
+
+BKInfoBar.xml
+BKInfoBar.lua

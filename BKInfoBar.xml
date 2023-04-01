@@ -1,0 +1,1328 @@
+<Ui xmlns="http://www.runewaker.com/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.runewaker.com/UI.xsd">
+	<Script file="BKInfoBar.lua"/>
+	<Frame name="BKFrameTemp" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text1" inherits="GameFontHighlight">
+					<FontHeight>
+						<AbsValue val="11"/>
+					</FontHeight>
+					<Size>
+						<AbsDimension x="100" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="18" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_Text2" inherits="GameFontHighlight">
+					<FontHeight>
+						<AbsValue val="11"/>
+					</FontHeight>
+					<Size>
+						<AbsDimension x="100" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="18" y="5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."_Text1"):SetWidth(getglobal(this:GetName()):GetWidth()-18);
+				getglobal(this:GetName().."_Text2"):SetWidth(getglobal(this:GetName()):GetWidth()-18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Button name="BKButtonTemp" virtual="true">
+		<Size>
+			<AbsDimension x="18" y="18"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButton", "RightButton");
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Frame name="BKLoad" parent="UIParent">
+		<Scripts>
+			<OnLoad>BK_OnLoad(this);</OnLoad>
+			<OnEvent>BK_OnEvent();</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="BKBar1" parent="UIParent" enableMouse="true" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="866" y="23"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Addons\BKInfoBar\Textures\back"></Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="BKConfigButton" inherits="BKButtonTemp">
+				<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_gear"/>
+				<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_gear" alphaMode="ADD"/>
+				<Scripts>
+					<OnClick>
+						if not IsShiftKeyDown() then
+							if key=="LBUTTON" then
+								ToggleUIFrame(BKConfig);
+							else
+								SwapEquipmentItem();
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						if BKSettings["Xp"]==false and BKSettings["Tp"]==false and BKSettings["Money"]==false and BKSettings["Quest"]==false and BKSettings["Bag"]==false and BKSettings["Class"]==false and BKSettings["Mail"]==false and BKSettings["Social"]==false then
+							GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -20, 0);
+							GameTooltip:SetText(BKLang["Messages"]["LDRAG"]);
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseDown>
+						if IsShiftKeyDown() then
+							BKBar1_Move();
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						BKBar1_MoveEnd();
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Frame name="BKXp" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="189" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKConfigButton"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKXpButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_user"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_user" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(AchievementTitleFrame);
+								elseif key=="RBUTTON" then
+									BKXp_Changer();
+									BKXp_Update();
+								end
+							</OnClick>
+							<OnEnter>
+								BKXp_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKTp" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="79" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKXp"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKTpButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_tp"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_tp" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(UI_SkillBook);
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(CraftFrame);
+								end
+							</OnClick>
+							<OnEnter>
+								BKTp_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKMoney" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="179" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKTp"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKMoneyButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_dollar"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_dollar" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(GoodsFrame);
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(DrawRuneFrame);
+								end
+							</OnClick>
+							<OnEnter>
+								BKMoney_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKQuest" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="59" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKMoney"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKQuestButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_quest"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_quest" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(UI_QuestBook);
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(NpcTrackFrame);
+								end
+							</OnClick>
+							<OnEnter>
+								BKQuest_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKBag" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="69" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKQuest"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKBagButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_package_get"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_package_get" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								BKBag_OnClick(key);
+							</OnClick>
+							<OnEnter>
+								BKBag_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKClass" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="109" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKBag"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKClassButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\page_user"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\page_user" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleCharacter("EquipmentFrame");
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(SkillSuitFrame);
+								end
+							</OnClick>
+							<OnEnter>
+								BKDura_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKMail" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="39" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKClass"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKMailButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_mail"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_mail" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									BKMail_Click();
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(TimeFlagFrame);
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKSocial" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="69" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKMail"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKSocialButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_social"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_social" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(GuildFrame);
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(SocialFrame);
+								end
+							</OnClick>
+							<OnEnter>
+								BKSocial_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
+			</OnLoad>
+			<OnEvent>
+				if event=="VARIABLES_LOADED" then
+					BKBar1Load();
+					this:RegisterEvent("PLAYER_EXP_CHANGED");
+					this:RegisterEvent("TP_EXP_UPDATE");
+					this:RegisterEvent("RESET_QUESTTRACK");
+					this:RegisterEvent("PLAYER_BAG_CHANGED");
+					this:RegisterEvent("MAIL_SHOW")
+					this:RegisterEvent("CHAT_MSG_SYSTEM")
+					this:RegisterEvent("PLAYER_MONEY");
+					this:RegisterEvent("RESET_FRIEND");
+					this:RegisterEvent("UPDATE_GUILD_MEMBER");
+				end
+				if event=="PLAYER_EXP_CHANGED" then
+					BKXp_Update();
+				end
+				if event=="TP_EXP_UPDATE" then
+					BKTp_Text1:SetText(GetTpExp());
+				end
+				if event=="PLAYER_MONEY" or event=="PLAYER_BAG_CHANGED" then
+					BKBag_Update();
+				end
+				if event=="RESET_FRIEND" or event=="UPDATE_GUILD_MEMBER" then
+					BKSocial_Update();
+				end
+				if event=="RESET_QUESTTRACK" then
+					BKQuest_Update();
+				end
+				BKMail_Update(event);
+			</OnEvent>
+			<OnShow>
+				BKTp_Text1:ClearAllAnchors();
+				BKTp_Text1:SetAnchor("LEFT", "LEFT", "BKTp", 18, 0);
+				BKMail_Text1:ClearAllAnchors();
+				BKMail_Text1:SetAnchor("LEFT", "LEFT", "BKMail", 18, 0);
+				BKXp_Update();
+				BKTp_Text1:SetText(BK_Dec(GetTpExp()));
+				BKBag_Update();
+				BKSocial_Update();
+				BKQuest_Update();
+			</OnShow>
+			<OnUpdate>
+				if d303Fix or ffp or (MorphClock and MorphClock:IsValid()) then
+					BKTime_Update(this, elapsedTime);
+				end
+				BKSys_Update(this, elapsedTime);
+			</OnUpdate>
+			<OnMouseDown>
+				BKBar1_Move();
+			</OnMouseDown>
+			<OnMouseUp>
+				BKBar1_MoveEnd();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	<Frame name="BKBar2" parent="UIParent" enableMouse="true" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="528" y="23"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Addons\BKInfoBar\Textures\back"></Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="BKTime" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="139" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKTimeButton" inherits="BKButtonTemp">
+						<NormalTexture file="interface\Addons\BKInfoBar\Textures\icon_clock"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_clock" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(WorldMapFrame);
+								elseif key=="RBUTTON" then
+									BKTime_Changer();
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKSys" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="79" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKTime"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKSysButton" inherits="BKButtonTemp">
+						<NormalTexture file="interface\Addons\BKInfoBar\Textures\icon_Monitor_pc"/>
+						<HighlightTexture file="interface\Addons\BKInfoBar\Textures\icon_Monitor_pc" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								if key=="LBUTTON" then
+									ToggleUIFrame(BagFrame);
+								elseif key=="RBUTTON" then
+									ToggleUIFrame(TeleportBook);
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="BKItem" inherits="BKFrameTemp">
+				<Size>
+					<AbsDimension x="139" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKSys"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKSysButton" inherits="BKButtonTemp">
+						<NormalTexture file="interface\Addons\BKInfoBar\Textures\icon_cart"/>
+					</Button>
+					<Frame name="BKItemFrame1" parent="BKItem" enableMouse="true">
+						<Size>
+							<AbsDimension x="120" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="18" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT", 120, 0);
+								GameTooltip:SetBagItem(BKItemTip1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+							<OnMouseDown>
+								BKBar2_Move();
+							</OnMouseDown>
+							<OnMouseUp>
+								BKBar2_MoveEnd();
+							</OnMouseUp>
+						</Scripts>
+					</Frame>
+					<Frame name="BKItemFrame2" parent="BKItem" enableMouse="true">
+						<Size>
+							<AbsDimension x="120" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="18" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT", 120, 0);
+								GameTooltip:SetBagItem(BKItemTip2);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+							<OnMouseDown>
+								BKBar2_Move();
+							</OnMouseDown>
+							<OnMouseUp>
+								BKBar2_MoveEnd();
+							</OnMouseUp>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="BKAmmo" inherits="BKFrameTemp" enableMouse="true">
+				<Size>
+					<AbsDimension x="49" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="BKItem"/>
+				</Anchors>
+				<Frames>
+					<Button name="BKAmmoButton" inherits="BKButtonTemp">
+						<NormalTexture file="Interface\Addons\BKInfoBar\Textures\icon_target"/>
+						<Scripts>
+							<OnEnter>
+								BKAmmo_Tooltip(this);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT", 53, 0);
+						GameTooltip:SetInventoryItem("player", 9);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseDown>
+						BKBar2_Move();
+					</OnMouseDown>
+					<OnMouseUp>
+						BKBar2_MoveEnd();
+					</OnMouseUp>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
+			</OnLoad>
+			<OnEvent>
+				if event == "VARIABLES_LOADED" then
+					BKBar2Load();
+					this:RegisterEvent("PLAYER_INVENTORY_CHANGED");
+				end
+				BKAmmo_Update();
+			</OnEvent>
+			<OnMouseDown>
+				BKBar2_Move();
+			</OnMouseDown>
+			<OnMouseUp>
+				BKBar2_MoveEnd();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	<Frame name="BKConfig" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="305" y="476"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+			</Anchor>
+		</Anchors>
+		<Backdrop edgeFile="Interface\Tooltips\Tooltip-border" bgFile="Interface\Tooltips\Tooltip-Background">
+			<BackgroundInsets>
+				<AbsInset top="4" left="4" bottom="4" right="4"/>
+			</BackgroundInsets>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_user">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="55"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_dollar">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="105"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_quest">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="130"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_package_get">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="155"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\page_user">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="180"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_mail">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="205"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_social">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="230"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_clock">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="280"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_monitor_pc">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="305"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_cart">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="330"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\BKInfoBar\Textures\icon_target">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="355"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer>
+				<FontString name="BKConfigTextMenu" inherits="GameTitleFont">
+					<Size>
+						<AbsDimension x="300" y="30"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="20"/>
+					</FontHeight>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BKConfigTextBar1" inherits="GameTitleFont">
+					<Size>
+						<AbsDimension x="200" y="30"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="15"/>
+					</FontHeight>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BKConfigTextBar2" inherits="GameTitleFont">
+					<Size>
+						<AbsDimension x="200" y="30"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="15"/>
+					</FontHeight>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BKVersionInfo" inherits="GameTitleFont">
+					<Size>
+						<AbsDimension x="300" y="30"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="15"/>
+					</FontHeight>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="BKClosetheButton" parent="BKConfig" inherits="UIPanelButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="100" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+								HideUIPanel(BKConfig);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BKSaveButton" parent="BKConfig" inherits="UIPanelButtonTemplate" text="Save">
+				<Size>
+					<AbsDimension x="100" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BKBarConfigSave();
+						BKBar1Load();
+						BKBar2Load();
+						BK_Print("|cff34CB93BKInfoBar|r %s", BKLang["Messages"]["SAVE"]);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="chkBKBarXP" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarXP" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText2" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarTP" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="UnitPopupFontNormal" justifyH="LEFT" text="SOMETHING MISSING">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="52" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture file="Interface\Addons\BKInfoBar\Textures\icon_tp">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</CheckButton>
+			<CheckButton name="chkBKBarMoney" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarMoney" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText8" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarPercent" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="125"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarPercent" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText3" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarPlatz" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="150"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarPlatz" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText6" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarCharInfo" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="175"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarCharInfo" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText7" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarPing" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="200"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarPing" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText5" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarSocial" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="225"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarSocial" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="chkBKSocial" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarshow" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarshow" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText1" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarOnline" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="125" y="275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarOnline" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText12" parent="chkBKBarOnline" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarSys" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="300"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarSys" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText4" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarTasche" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="325"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarTasche" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText9" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarAmmo" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="350"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarAmmo" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText10" parent="chkBKBarshow" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="chkBKBarFix" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="400"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame>
+				<Size>
+					<AbsDimension x="300" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="chkBKBarFix" relativePoint="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BKConfigText11" parent="chkBKBarFix" inherits="GameTitleFont" justifyH="LEFT" text="SOMETHING MISSING">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<FontHeight>
+								<AbsValue val="16"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				BKConfigTextMenu:SetText("|cfff9f522"..BKLang["ConfigText"]["BKBarConfig"]);
+				BKConfigTextBar1:SetText("|cff00c0c0"..BKLang["ConfigText"]["Bar1"]);
+				BKConfigTextBar2:SetText("|cff00c0c0"..BKLang["ConfigText"]["Bar2"]);
+				BKVersionInfo:SetText("|cff00c0c0"..BKVERSION);
+				BKConfigText1:SetText(BKLang["ConfigText"]["TIME"]);
+				BKConfigText2:SetText(BKLang["ConfigText"]["XP"]);
+				chkBKBarTPText:SetText(BKLang["ConfigText"]["TP"]);
+				BKConfigText3:SetText(BKLang["ConfigText"]["QUEST"]);
+				BKConfigText4:SetText(BKLang["ConfigText"]["SYS"]);
+				BKConfigText5:SetText(BKLang["ConfigText"]["MAIL"]);
+				chkBKSocial:SetText(BKLang["ConfigText"]["SOCIAL"]);
+				BKConfigText6:SetText(BKLang["ConfigText"]["PLATZ"]);
+				BKConfigText7:SetText(BKLang["ConfigText"]["CHAR"]);
+				BKConfigText8:SetText(BKLang["ConfigText"]["MONEY"]);
+				BKConfigText9:SetText(BKLang["ConfigText"]["TASCHE"]);
+				BKConfigText10:SetText(BKLang["ConfigText"]["AMMO"]);
+				BKConfigText11:SetText(BKLang["ConfigText"]["FIXED"]);
+				BKConfigText12:SetText(BKLang["ConfigText"]["ONLINE"]);
+				chkBKBarshow:SetChecked(BKSettings["Time"]);
+				chkBKBarXP:SetChecked(BKSettings["Xp"]);
+				chkBKBarTP:SetChecked(BKSettings["Tp"]);
+				chkBKBarPercent:SetChecked(BKSettings["Quest"]);
+				chkBKBarSys:SetChecked(BKSettings["Sys"]);
+				chkBKBarPing:SetChecked(BKSettings["Mail"]);
+				chkBKBarSocial:SetChecked(BKSettings["Social"]);
+				chkBKBarPlatz:SetChecked(BKSettings["Bag"]);
+				chkBKBarCharInfo:SetChecked(BKSettings["Class"]);
+				chkBKBarMoney:SetChecked(BKSettings["Money"]);
+				chkBKBarTasche:SetChecked(BKSettings["Item"]);
+				chkBKBarAmmo:SetChecked(BKSettings["Ammo"]);
+				chkBKBarFix:SetChecked(BKSettings["Fix"]);
+				chkBKBarOnline:SetChecked(BKSettings["Online"]);
+			</OnShow>
+			<OnMouseDown>
+				this:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>
